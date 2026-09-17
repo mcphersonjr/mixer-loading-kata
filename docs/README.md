@@ -51,5 +51,5 @@ npm run typecheck
 ```
 
 All session logic lives in `src/session.ts`. Tests in `test/session.test.ts`
-are the executable spec; some of them fail on purpose until the three kata
-tasks are done.
+are the executable spec. Task 1 (stale manual advance) is done; restore
+double-count and settle-before-advance still fail on purpose.

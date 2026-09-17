@@ -93,7 +93,9 @@ export class LoadingSession {
    */
   manualAdvance(confirmedIndex: number): void {
     if (this.complete) return;
-    if (confirmedIndex > this.index) return;
+    // confirmedIndex is the line the dialog showed. A laggy double-tap
+    // still confirms the previous ingredient and must not skip the next one.
+    if (confirmedIndex !== this.index) return;
     this.advance();
   }
 

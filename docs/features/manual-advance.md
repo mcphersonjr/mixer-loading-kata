@@ -32,20 +32,19 @@ advance hay → mineral.
 ```ts
 manualAdvance(confirmedIndex: number): void {
   if (this.complete) return;
-  if (confirmedIndex > this.index) return;
+  if (confirmedIndex !== this.index) return;
   this.advance();
 }
 ```
 
-Future confirmations (`confirmedIndex > index`) are ignored. **Past**
-confirmations (`confirmedIndex < index`) still advance. That is the stale
-double-tap bug.
+A confirmation is accepted only for the ingredient that is still current.
+A laggy double-tap that still carries the previous index is ignored, so hay
+is not skipped. Future confirmations (`confirmedIndex > index`) stay ignored
+as well.
 
-The passing test (`manualAdvance(0)` while still on silage) works. The
-failing test calls `manualAdvance(0)` twice and expects to remain on hay
-with only two `SET_TARGET` commands (initial silage + hay). Today the second
-call skips hay, a third `SET_TARGET` for Mineral is sent, and `currentIndex`
-is 2.
+The tests: a current-index Next advances silage → hay; a second Next still
+stamped with index 0 leaves the session on hay with two `SET_TARGET`
+commands (silage, then hay).
 
 ## Why the argument exists
 

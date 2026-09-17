@@ -6,17 +6,13 @@ plus gaps the kata asks you to notice even though they are not failing tests.
 Intended behavior is defined by the root `README.md`, comments on
 `SessionOptions` / `manualAdvance` / `carriedLbs`, and `test/session.test.ts`.
 
-## Kata tasks (tests fail on purpose)
+## Kata tasks
 
-### 1. Stale manual advance
+### 1. Stale manual advance — done
 
-- **Spec:** Ignore `manualAdvance(confirmedIndex)` unless that index is still
-  the current ingredient.
-- **Code:** Only ignores `confirmedIndex > index`. A late confirm for a
-  **previous** index still calls `advance()`.
-- **Fix shape:** `if (confirmedIndex !== this.index) return;` (and keep the
-  complete guard).
-- **Doc:** [manual advance](./features/manual-advance.md)
+Ignore `manualAdvance(confirmedIndex)` unless that index is still current
+(`confirmedIndex !== this.index`). A laggy double-tap no longer skips the
+next ingredient. See [manual advance](./features/manual-advance.md).
 
 ### 2. Restore double-counts
 
@@ -49,6 +45,7 @@ Intended behavior is defined by the root `README.md`, comments on
 - Completing the last ingredient sends `RECIPE_COMPLETE` and clears
   `currentIngredient`.
 - Fresh `manualAdvance` of the **current** index advances.
+- Stale `manualAdvance` for a previous index is ignored.
 - Restore without further readings preserves index and loaded.
 - Empty recipe throws. Snapshot / recipe id mismatch throws.
 
