@@ -24,6 +24,12 @@ Two things matter a lot to us:
    nothing is happening, and a bucket landing in the mixer makes the reading
    bounce for a second before it settles.
 
+## Documentation
+
+Feature-by-feature spec for this session lives in [`docs/`](./docs/README.md).
+Use that folder as context before changing loading behavior: intended
+rules, current code, and known gaps are recorded there.
+
 ## The code
 
 | File | What it is |
