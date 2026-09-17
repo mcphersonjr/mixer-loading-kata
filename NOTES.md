@@ -44,3 +44,25 @@ It now requires an exact match: ignore the tap unless confirmedIndex is still th
 ```
 
 
+### Task 2
+
+For this task I literally just asked the agent to "Look into task 2 and let me know what you think". With the agent in "ask" mode, it returned a description of what happens and suggested fixes. As I read through the "problem" I fell down a rabbit hole trying to understand terms and applying them to variables. At one point the agent states "I would ask whether the scale keeps running across an app restart and whether we should credit that gap." of which I assumed that the scale does keep running. Which after going down the hole I recognized what the agent was stating, which was that there was a problem around setting the `carriedLbs` to the `loadedLbs` for a session. This results in getting the failed test results and in this scenario (scale keeps running) has no reason for setting the `carriedLbs` to anything other than zero. 
+
+Understanding that there may be a reason for re-achoring using the `carriedLbs`, I prompted the agent to talk through cases in which this would be viable.
+```
+let's say that the scale does keep running across the app restart. however we need to account for if the scale stops while the app is also down. would this be a case for needing to reachor?
+```
+
+In the agent's explaination it provided me with 3 scenarios that I found viable:
+• Scale rebooted and re-zeroed / re-tared
+• Load cells came back at 0 (or some other reset) while the wagon still has feed
+• Someone tared with feed already in the mixer
+
+Because the scenarios were potetially viable to happen in the real world, I asked the agent to render a plan: 
+```
+so let's create a plan and include the implementation for the lastGross as well 
+```
+
+This plan would be something that I would need to review with product to better understand what would be expected from the application and how it should perform in certain scenarios. 
+
+This plan is as far as I got and is located in `docs/plans/restore-lastgross-frame-check.md`.

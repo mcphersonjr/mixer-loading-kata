@@ -40,6 +40,7 @@ with those sources, the docs say so.
 | [features/scale-simulator.md](./features/scale-simulator.md) | Deterministic noisy scale |
 | [features/demo.md](./features/demo.md) | `npm run demo` walkthrough |
 | [spec-vs-implementation.md](./spec-vs-implementation.md) | Known bugs, kata tasks, ship gaps |
+| [plans/restore-lastgross-frame-check.md](./plans/restore-lastgross-frame-check.md) | Task 2 plan: restore, lastGross, lost-zero re-anchor |
 
 ## Run the project
 
