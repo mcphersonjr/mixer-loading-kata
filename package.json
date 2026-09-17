@@ -1,0 +1,18 @@
+{
+  "name": "mixer-loading-kata",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A small feed-mixer loading session driven by scale readings. Interview kata.",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "demo": "tsx src/demo.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}
