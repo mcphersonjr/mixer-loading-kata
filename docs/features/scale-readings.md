@@ -20,8 +20,8 @@ held 800 lb of leftover feed, then received 400 lb of silage, reads 1200.
 - The session treats the stream as authoritative. It does not drop, smooth,
   or replace `gross` when computing `loaded`.
 - The first reading of an ingredient **sets the anchor** and credits nothing
-  new (`loaded = carriedLbs`, which is 0 for a fresh ingredient).
-- Later readings set `loaded = carriedLbs + (gross - anchorGross)`.
+  new (`loaded = 0`).
+- Later readings set `loaded = gross - anchorGross`.
 - Readings after `isComplete` update `lastGross` internally but do not
   change index, loaded, or the head.
 - Noise is real. Callers should keep sending readings during vibration and
@@ -34,9 +34,9 @@ held 800 lb of leftover feed, then received 400 lb of silage, reads 1200.
 
 1. Always stores `lastGross = reading.gross`.
 2. Returns immediately if the session is complete.
-3. If `anchorGross === null`, sets the anchor, sets `loadedLbs = carriedLbs`,
+3. If `anchorGross === null`, sets the anchor, sets `loadedLbs = 0`,
    sends `SET_TARGET`, and returns. No auto-advance on this reading.
-4. Otherwise updates `loadedLbs` from the delta and auto-advances if
+4. Otherwise updates `loadedLbs` from `gross − anchor` and auto-advances if
    `withinTolerance()` — **without** waiting for settle (see
    [auto-advance](./auto-advance.md)).
 

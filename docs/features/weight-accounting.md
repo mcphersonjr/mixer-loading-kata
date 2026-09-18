@@ -11,7 +11,6 @@ This is the heart of product rule 1: **the scale is the source of truth**.
 | --- | --- |
 | Gross | Total pounds on the mixer right now. |
 | Anchor (`anchorGross`) | Gross at the start of the current ingredient. |
-| Carried (`carriedLbs`) | Pounds already credited to this ingredient in a **previous process** (restore only). |
 | Loaded | Pounds of the current ingredient, per the scale. |
 | Remaining | Pounds still to dump to hit target, floored at 0. |
 
@@ -19,12 +18,12 @@ Loaded is **not** a running total across the recipe. After advancing from
 silage to hay, hay's loaded starts at 0 even though the mixer still holds
 all of the silage. That leftover is inside the new anchor.
 
-## Intended formulas
+## Formulas
 
 While an ingredient is in progress and an anchor exists:
 
 ```text
-loaded    = carriedLbs + (gross − anchorGross)
+loaded    = gross − anchorGross
 remaining = max(0, targetLbs − loaded)
 ```
 
@@ -32,7 +31,7 @@ On the **first reading** of an ingredient (`anchorGross` was `null`):
 
 ```text
 anchorGross = gross
-loaded      = carriedLbs    // 0 for a normal start; persisted loaded after restore
+loaded      = 0
 ```
 
 That first reading does not treat the current gross as newly dumped feed.
@@ -40,13 +39,16 @@ That first reading does not treat the current gross as newly dumped feed.
 On **advance** to the next ingredient:
 
 ```text
-carriedLbs  = 0
 loaded      = 0
 anchorGross = lastGross     // whatever is on the mixer right now
 ```
 
 The next line therefore measures only **new** weight on top of everything
 already in the wagon.
+
+After **restore**, the original `anchorGross` is kept. `loadedLbs` from the
+snapshot is shown until the next tick, then the same `gross − anchor`
+formula applies. See [persistence](./persistence.md).
 
 ## Worked example (from the first unit test)
 
@@ -70,18 +72,12 @@ After the line is accepted, hay anchors at lastGross (1785) with loaded 0.
 That is why the test expects `SET_TARGET` for Hay with `remainingLbs: 500`
 even though the mixer already weighs ~1785.
 
-## Current implementation
+## Known gap
 
-Matches the formulas above for a live, unrestored session.
-
-Two persistence interactions can break the formula; both are documented in
-[persistence](./persistence.md):
-
-1. Restore currently sets **both** `carriedLbs = snapshot.loadedLbs` **and**
-   `anchorGross = snapshot.anchorGross`. The next reading then does
-   `carried + (gross − oldAnchor)`, which **double-counts**.
-2. `lastGross` is not in the snapshot. A restore followed by `manualAdvance`
-   with no intervening reading re-anchors the next ingredient at `null`.
+`lastGross` is not in the snapshot. A restore followed by `manualAdvance`
+with no intervening reading re-anchors the next ingredient at `null`. That
+is called out in the [restore plan](../plans/restore-lastgross-frame-check.md)
+and is not part of this same-frame restore fix.
 
 ## Things the math does not hide
 

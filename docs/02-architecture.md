@@ -56,9 +56,8 @@ Internals that matter when reading the code:
 
 | Field | Role |
 | --- | --- |
-| `anchorGross` | Gross when the current ingredient started. `null` until the first reading of that ingredient (or after restore, depending on the restore bug). |
+| `anchorGross` | Gross when the current ingredient started. `null` until the first reading of that ingredient. Restore copies the original anchor so the scale can keep crediting from it. |
 | `lastGross` | Most recent reading. Used to re-anchor the next ingredient on advance. **Not snapshotted.** |
-| `carriedLbs` | Lbs already credited to this ingredient **before this process started**. Restore is the only writer of a non-zero value. |
 | `loadedLbs` | What `loaded` returns. |
 | `complete` | Latch; further readings and manual advances are no-ops. |
 
@@ -74,8 +73,8 @@ Internals that matter when reading the code:
 
 ## Design constraints to preserve
 
-1. Keep weight math a function of gross and anchor (plus `carriedLbs` after
-   restore). Do not introduce a parallel "estimated loaded" path.
+1. Keep weight math a function of gross and anchor. Do not introduce a
+   parallel "estimated loaded" path.
 2. Keep the session free of timers. Settling is counted in **readings**, not
    wall clock.
 3. Keep `HeadTransport` a one-method interface so a React Native screen can

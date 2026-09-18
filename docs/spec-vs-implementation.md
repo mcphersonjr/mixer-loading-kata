@@ -4,7 +4,7 @@ A punch list of where the running code disagrees with the intended product,
 plus gaps the kata asks you to notice even though they are not failing tests.
 
 Intended behavior is defined by the root `README.md`, comments on
-`SessionOptions` / `manualAdvance` / `carriedLbs`, and `test/session.test.ts`.
+`SessionOptions` / `manualAdvance`, and `test/session.test.ts`.
 
 ## Kata tasks
 
@@ -14,18 +14,16 @@ Ignore `manualAdvance(confirmedIndex)` unless that index is still current
 (`confirmedIndex !== this.index`). A laggy double-tap no longer skips the
 next ingredient. See [manual advance](./features/manual-advance.md).
 
-### 2. Restore double-counts
+### 2. Restore double-counts — done (same-frame)
 
-- **Spec:** After restore, keep crediting from the scale. Persisted loaded
-  is a starting credit, not something to add on top of the old
-  `gross − anchor` delta.
-- **Code:** Restore sets `carriedLbs = snapshot.loadedLbs` **and** restores
-  the old `anchorGross`. The next reading computes
-  `carried + (gross − oldAnchor)`.
-- **Fix shape (matches `carriedLbs` comments):** do not keep the old live
-  anchor after restore (`anchorGross = null`) so the first new reading
-  re-anchors and `loaded` stays at the carried amount.
-- **Doc:** [persistence](./features/persistence.md)
+Restore keeps the original `anchorGross` and does **not** add persisted
+`loadedLbs` into the next delta. After `800, 1300` then restore then
+`1300, 1500`, loaded is `700` (`1500 − 800`). There is no `carriedLbs`;
+that field only belonged to a re-anchor-on-restart model.
+
+Lost scale zero and persisting `lastGross` are still open; see
+[the restore plan](./plans/restore-lastgross-frame-check.md) and
+[persistence](./features/persistence.md).
 
 ### 3. Settle before auto-advance
 
@@ -47,6 +45,7 @@ next ingredient. See [manual advance](./features/manual-advance.md).
 - Fresh `manualAdvance` of the **current** index advances.
 - Stale `manualAdvance` for a previous index is ignored.
 - Restore without further readings preserves index and loaded.
+- After restore, further readings are `gross − originalAnchor` (no double-count).
 - Empty recipe throws. Snapshot / recipe id mismatch throws.
 
 ## Gaps that are not tests (would not ship as-is)

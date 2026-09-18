@@ -21,8 +21,6 @@ export class LoadingSession {
   private index = 0;
   private anchorGross: number | null = null;
   private lastGross: number | null = null;
-  /** Lbs credited to the current ingredient before this process started. */
-  private carriedLbs = 0;
   private loadedLbs = 0;
   private complete = false;
   private readonly options: SessionOptions;
@@ -73,12 +71,12 @@ export class LoadingSession {
       // First reading of the ingredient: whatever is on the mixer now is the
       // baseline. Nothing has been loaded yet.
       this.anchorGross = reading.gross;
-      this.loadedLbs = this.carriedLbs;
+      this.loadedLbs = 0;
       this.sendTarget();
       return;
     }
 
-    this.loadedLbs = this.carriedLbs + (reading.gross - this.anchorGross);
+    this.loadedLbs = reading.gross - this.anchorGross;
 
     if (this.withinTolerance()) {
       this.advance();
@@ -123,8 +121,10 @@ export class LoadingSession {
     }
     const session = new LoadingSession(recipe, head, options);
     session.index = snapshot.index;
+    // Keep the original ingredient start. The scale is still in the same
+    // zero, so later readings are gross − this anchor, not persisted loaded
+    // plus that delta.
     session.anchorGross = snapshot.anchorGross;
-    session.carriedLbs = snapshot.loadedLbs;
     session.loadedLbs = snapshot.loadedLbs;
     session.complete = snapshot.complete;
     return session;
@@ -140,7 +140,6 @@ export class LoadingSession {
 
   private advance(): void {
     this.index += 1;
-    this.carriedLbs = 0;
     this.loadedLbs = 0;
 
     if (this.index >= this.recipe.ingredients.length) {

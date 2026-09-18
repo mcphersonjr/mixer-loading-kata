@@ -12,7 +12,7 @@ new LoadingSession(recipe, head, options?)
 - Throws if `recipe.ingredients.length === 0`.
 - Options default to `{ stableTicks: 3, settleLbs: 5 }` and are merged with
   the partial the caller passed.
-- Initial state: `index = 0`, `anchorGross = null`, `carriedLbs = 0`,
+- Initial state: `index = 0`, `anchorGross = null`,
   `loadedLbs = 0`, `complete = false`, `lastGross = null`.
 - The head is **not** notified at construct. The first `SET_TARGET` is sent
   on the first scale reading (once the anchor exists and remaining can be

@@ -4,8 +4,9 @@ Fix restore double-counting by keeping the original scale anchor, persist
 `lastGross`, and re-anchor only when the first post-restore reading looks
 like a lost scale zero.
 
-This is the working plan for kata task 2 plus the scale-frame cases we
-agreed on. It is not implemented yet.
+This is the working plan for lost-zero restore and persisting `lastGross`.
+Same-frame restore (keep the original anchor, no `carriedLbs`) is already
+implemented; see [persistence](../features/persistence.md).
 
 ## Status
 
