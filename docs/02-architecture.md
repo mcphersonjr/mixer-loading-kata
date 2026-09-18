@@ -59,6 +59,7 @@ Internals that matter when reading the code:
 | `anchorGross` | Gross when the current ingredient started. `null` until the first reading of that ingredient. Restore copies the original anchor so the scale can keep crediting from it. |
 | `lastGross` | Most recent reading. Used to re-anchor the next ingredient on advance. **Not snapshotted.** |
 | `loadedLbs` | What `loaded` returns. |
+| `stableCount` | Consecutive settled, in-tolerance readings toward auto-advance. Not snapshotted. |
 | `complete` | Latch; further readings and manual advances are no-ops. |
 
 ## Ownership

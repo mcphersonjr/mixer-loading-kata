@@ -25,21 +25,17 @@ Lost scale zero and persisting `lastGross` are still open; see
 [the restore plan](./plans/restore-lastgross-frame-check.md) and
 [persistence](./features/persistence.md).
 
-### 3. Settle before auto-advance
+### 3. Settle before auto-advance — done
 
-- **Spec:** Advance only after `stableTicks` consecutive readings that are
-  each in tolerance **and** moved at most `settleLbs` from the previous
-  gross. Reset the count when either condition fails. Do not advance on the
-  anchor reading itself.
-- **Code:** `advance()` on the first in-tolerance reading. Options are
-  merged and ignored.
-- **Doc:** [auto-advance](./features/auto-advance.md)
+Advance only after `stableTicks` consecutive readings that are each in
+tolerance **and** moved at most `settleLbs` from the previous gross. Reset
+the count when either condition fails. The anchor reading itself does not
+count. See [auto-advance](./features/auto-advance.md).
 
 ## Working today (keep these green)
 
 - First-ingredient credit is `gross − anchor`.
-- Auto-advance (without settling) re-anchors the next ingredient from
-  `lastGross` and sends `SET_TARGET`.
+- Auto-advance waits for `stableTicks` settled, in-tolerance readings.
 - Completing the last ingredient sends `RECIPE_COMPLETE` and clears
   `currentIngredient`.
 - Fresh `manualAdvance` of the **current** index advances.
@@ -65,7 +61,6 @@ These are fair `NOTES.md` material and interview discussion points.
 | Overshoot | `remainingLbs` floors at 0; loaded can exceed target; no "stop, you overshot" command to the head. |
 | No validation of weights | Negative targets, NaN gross, huge jitter all accepted. |
 | Head send is synchronous and unretried | A real transport will fail; the session will not know. |
-| Demo uses default settle options against unimplemented settle | Demo can still skip on bounce until task 3 is done. |
 
 ## Wiring this into a UI later
 

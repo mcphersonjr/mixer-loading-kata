@@ -37,7 +37,7 @@ and remaining can exceed target.
 ```text
 construct
   → first onReading: set anchor, SET_TARGET for ingredient 0
-  → more readings: update loaded; maybe auto-advance
+  → more readings: update loaded; auto-advance only after settled in-tolerance ticks
   → optional manualAdvance: skip remaining of current line
     (stale confirmations for a previous index are ignored)
   → on advance: next ingredient, re-anchor from lastGross, SET_TARGET

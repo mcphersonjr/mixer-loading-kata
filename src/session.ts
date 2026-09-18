@@ -23,6 +23,8 @@ export class LoadingSession {
   private lastGross: number | null = null;
   private loadedLbs = 0;
   private complete = false;
+  /** Consecutive in-tolerance, settled readings toward auto-advance. */
+  private stableCount = 0;
   private readonly options: SessionOptions;
 
   constructor(
@@ -64,23 +66,23 @@ export class LoadingSession {
 
   /** Feed every reading from the scale here, in order. */
   onReading(reading: ScaleReading): void {
+    const prevGross = this.lastGross;
     this.lastGross = reading.gross;
     if (this.complete) return;
 
     if (this.anchorGross === null) {
       // First reading of the ingredient: whatever is on the mixer now is the
-      // baseline. Nothing has been loaded yet.
+      // baseline. Nothing has been loaded yet. Do not count this tick toward
+      // settle / auto-advance.
       this.anchorGross = reading.gross;
       this.loadedLbs = 0;
+      this.stableCount = 0;
       this.sendTarget();
       return;
     }
 
     this.loadedLbs = reading.gross - this.anchorGross;
-
-    if (this.withinTolerance()) {
-      this.advance();
-    }
+    this.maybeAutoAdvance(prevGross, reading.gross);
   }
 
   /**
@@ -138,9 +140,35 @@ export class LoadingSession {
     return this.loadedLbs >= ing.targetLbs - ing.toleranceLbs;
   }
 
+  /**
+   * Gate auto-advance on a settled scale, not a single in-tolerance spike.
+   * Loaded is already `gross − anchor` (signed) before this runs. Math.abs
+   * here is only "how far did this tick move?", never the credited weight.
+   */
+  private maybeAutoAdvance(prevGross: number | null, gross: number): void {
+    // Quiet = previous tick exists and |this gross − last gross| <= settleLbs.
+    // A dump up or a bounce down both fail; neither changes `loadedLbs`.
+    const settled =
+      prevGross !== null &&
+      Math.abs(gross - prevGross) <= this.options.settleLbs;
+
+    // Count consecutive ticks that are both in band and quiet. Bounce or
+    // leaving tolerance starts the streak over.
+    if (this.withinTolerance() && settled) {
+      this.stableCount += 1;
+    } else {
+      this.stableCount = 0;
+    }
+
+    if (this.stableCount >= this.options.stableTicks) {
+      this.advance();
+    }
+  }
+
   private advance(): void {
     this.index += 1;
     this.loadedLbs = 0;
+    this.stableCount = 0;
 
     if (this.index >= this.recipe.ingredients.length) {
       this.complete = true;

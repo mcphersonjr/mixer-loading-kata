@@ -52,5 +52,5 @@ npm run typecheck
 ```
 
 All session logic lives in `src/session.ts`. Tests in `test/session.test.ts`
-are the executable spec. Tasks 1 and 2 (same-frame restore) are done;
-settle-before-advance still fails on purpose.
+are the executable spec. Tasks 1–3 are done. Lost-zero restore and
+persisting `lastGross` are still open product follow-ups.

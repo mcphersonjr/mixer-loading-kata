@@ -11,9 +11,9 @@ recipe against a noisy scale, not a test.
   - Mineral mix 120 ± 5
 - Head adapter logs every command as `head <- {json}`.
 - Scale starts at 850 lb true gross, seed 7.
-- Session uses default options (`stableTicks: 3`, `settleLbs: 5`). Until
-  task 3 is implemented, auto-advance still fires on the first in-tolerance
-  tick, so the demo can skip ahead on a bounce.
+- Session uses default options (`stableTicks: 3`, `settleLbs: 5`), so a
+  bouncing dump that only spikes through tolerance should not skip an
+  ingredient.
 
 ## Sequence
 

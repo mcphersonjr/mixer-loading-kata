@@ -36,9 +36,9 @@ held 800 lb of leftover feed, then received 400 lb of silage, reads 1200.
 2. Returns immediately if the session is complete.
 3. If `anchorGross === null`, sets the anchor, sets `loadedLbs = 0`,
    sends `SET_TARGET`, and returns. No auto-advance on this reading.
-4. Otherwise updates `loadedLbs` from `gross − anchor` and auto-advances if
-   `withinTolerance()` — **without** waiting for settle (see
-   [auto-advance](./auto-advance.md)).
+4. Otherwise updates `loadedLbs` from `gross − anchor` and auto-advances
+   only after `stableTicks` consecutive in-tolerance readings that each
+   moved at most `settleLbs` (see [auto-advance](./auto-advance.md)).
 
 `reading.at` is unused. There is no check that `at` increases, that `gross`
 is finite, or that readings were not dropped.

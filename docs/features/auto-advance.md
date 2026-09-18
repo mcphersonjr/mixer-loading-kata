@@ -4,8 +4,8 @@ When the scale says the current ingredient is close enough to target **and**
 the reading has stopped bouncing, the session should advance to the next
 line (or complete the recipe) without a driver tap.
 
-This is kata task 3. Options exist on the type and constructor; the session
-does **not** yet honor them.
+This is kata task 3. Options live on the constructor; the session honors
+them before auto-advance.
 
 ## Options
 
@@ -75,18 +75,16 @@ After the third settled tick, index is 1.
 
 ## Current implementation
 
-`onReading` calls `advance()` on the **first** in-tolerance reading after
-the anchor exists. `this.options` is stored and never read. There is no
-settle counter.
+`onReading` updates `loaded` from the scale on every tick, then increments
+`stableCount` only when the reading is both in tolerance and within
+`settleLbs` of the previous gross. Otherwise the count resets. Auto-advance
+runs when `stableCount >= stableTicks`.
 
-That is why a bounce through 1790 would skip silage even though the mixer
-then settles at 1720, 80 lb short of the 980 lb band.
+The first reading of an ingredient (and the tick that only sets the anchor)
+does not count. Manual Next still skips the settle gate.
 
-Existing tests that are not about settling pass `{ stableTicks: 1 }` so that
-once settling is implemented they still advance on the first **settled**
-in-band reading. They also repeat the in-band gross so the first post-anchor
-tick can fail the `settleLbs` check (big jump) and the next tick can pass it
-(zero movement).
+After restore the count starts at 0. The first post-restore tick also has
+no `lastGross`, so it cannot count as settled.
 
 ## Design choices to keep explicit
 
